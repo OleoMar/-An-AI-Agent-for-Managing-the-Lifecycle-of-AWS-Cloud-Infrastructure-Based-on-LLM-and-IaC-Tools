@@ -1,0 +1,12 @@
+{
+  "id": "scenario-012",
+  "category": "simple",
+  "description": "EBS volume для хранения данных",
+  "input": "Create an EBS volume of 100GB for persistent data storage",
+  "acceptance": {
+    "min_resources": 1,
+    "required_types": [
+      "aws_ebs_volume"
+    ]
+  }
+}

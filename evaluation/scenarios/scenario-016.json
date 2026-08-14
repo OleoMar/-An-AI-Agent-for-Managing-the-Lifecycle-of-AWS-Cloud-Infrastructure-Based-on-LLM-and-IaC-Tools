@@ -1,0 +1,13 @@
+{
+  "id": "scenario-016",
+  "category": "multi-resource",
+  "description": "S3 + SNS notification",
+  "input": "Create an S3 bucket for uploads and an SNS topic to notify when new files arrive",
+  "acceptance": {
+    "min_resources": 2,
+    "required_types": [
+      "aws_s3_bucket",
+      "aws_sns_topic"
+    ]
+  }
+}

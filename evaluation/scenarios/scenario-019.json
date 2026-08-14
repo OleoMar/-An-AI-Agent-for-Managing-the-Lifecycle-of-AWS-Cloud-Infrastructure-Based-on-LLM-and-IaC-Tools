@@ -1,0 +1,12 @@
+{
+  "id": "scenario-019",
+  "category": "multi-resource",
+  "description": "Два SQS — dead letter queue паттерн",
+  "input": "Create an SQS queue with a dead letter queue for failed message handling",
+  "acceptance": {
+    "min_resources": 2,
+    "required_types": [
+      "aws_sqs_queue"
+    ]
+  }
+}

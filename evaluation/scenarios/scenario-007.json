@@ -1,0 +1,15 @@
+{
+  "id": "scenario-007",
+  "category": "serverless",
+  "description": "Lambda + SQS + IAM role",
+  "input": "Create a Lambda function with an IAM role that reads messages from an SQS queue",
+  "acceptance": {
+    "min_resources": 3,
+    "required_types": [
+      "aws_lambda_function",
+      "aws_sqs_queue",
+      "aws_iam_role"
+    ],
+    "should_ask_clarification": false
+  }
+}

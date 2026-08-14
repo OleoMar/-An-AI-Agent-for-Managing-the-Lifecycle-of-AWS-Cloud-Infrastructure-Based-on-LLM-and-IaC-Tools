@@ -1,0 +1,9 @@
+{
+  "id": "scenario-013",
+  "category": "clarification",
+  "description": "Слишком расплывчато — должен спросить",
+  "input": "I want to deploy my application to the cloud",
+  "acceptance": {
+    "should_ask_clarification": true
+  }
+}

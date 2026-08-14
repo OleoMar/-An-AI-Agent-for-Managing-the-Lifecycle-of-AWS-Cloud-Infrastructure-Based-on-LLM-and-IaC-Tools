@@ -1,0 +1,137 @@
+{
+  "run_name": "run_dry_001",
+  "metrics": {
+    "n_total": 10,
+    "n_success": 8,
+    "n_failed": 2,
+    "tcr": 0.8,
+    "erd": 0.9,
+    "lat": 12.725,
+    "cost": 0.026606,
+    "svr": 0.0,
+    "total_tokens": 50848,
+    "total_cost_usd": 0.2661
+  },
+  "scenarios": [
+    {
+      "id": "scenario-001",
+      "input": "Create an S3 bucket for storing user profile photos",
+      "success": true,
+      "status": "done",
+      "generate_attempts": 1,
+      "tokens": 4888,
+      "cost_usd": 0.021288,
+      "latency_sec": 14.7,
+      "had_sec_violation": false,
+      "error": null
+    },
+    {
+      "id": "scenario-002",
+      "input": "Create a DynamoDB table for storing user sessions",
+      "success": true,
+      "status": "done",
+      "generate_attempts": 1,
+      "tokens": 4696,
+      "cost_usd": 0.018468,
+      "latency_sec": 8.6,
+      "had_sec_violation": false,
+      "error": null
+    },
+    {
+      "id": "scenario-003",
+      "input": "Create an SQS queue for background job processing",
+      "success": true,
+      "status": "done",
+      "generate_attempts": 1,
+      "tokens": 5239,
+      "cost_usd": 0.026505,
+      "latency_sec": 15.0,
+      "had_sec_violation": false,
+      "error": null
+    },
+    {
+      "id": "scenario-004",
+      "input": "Set up something for my app",
+      "success": true,
+      "status": "needs_clarification",
+      "generate_attempts": 0,
+      "tokens": 0,
+      "cost_usd": 0.0,
+      "latency_sec": 4.8,
+      "had_sec_violation": false,
+      "error": null
+    },
+    {
+      "id": "scenario-005",
+      "input": "I need an EC2 instance",
+      "success": false,
+      "status": "done",
+      "generate_attempts": 1,
+      "tokens": 6715,
+      "cost_usd": 0.041180999999999995,
+      "latency_sec": 23.9,
+      "had_sec_violation": false,
+      "error": null
+    },
+    {
+      "id": "scenario-006",
+      "input": "Create a VPC with a public subnet and an internet gateway for a web app in eu-north-1",
+      "success": true,
+      "status": "done",
+      "generate_attempts": 1,
+      "tokens": 6254,
+      "cost_usd": 0.035382,
+      "latency_sec": 16.2,
+      "had_sec_violation": false,
+      "error": null
+    },
+    {
+      "id": "scenario-007",
+      "input": "Create a Lambda function with an IAM role that reads messages from an SQS queue",
+      "success": false,
+      "status": "failed",
+      "generate_attempts": 1,
+      "tokens": 6708,
+      "cost_usd": 0.041796,
+      "latency_sec": 23.7,
+      "had_sec_violation": false,
+      "error": null
+    },
+    {
+      "id": "scenario-008",
+      "input": "Create a private S3 bucket for storing audit logs",
+      "success": true,
+      "status": "done",
+      "generate_attempts": 1,
+      "tokens": 4864,
+      "cost_usd": 0.020784,
+      "latency_sec": 14.4,
+      "had_sec_violation": false,
+      "error": null
+    },
+    {
+      "id": "scenario-009",
+      "input": "Create an SNS topic for order notifications and an SQS queue subscribed to it",
+      "success": true,
+      "status": "done",
+      "generate_attempts": 1,
+      "tokens": 6434,
+      "cost_usd": 0.03843,
+      "latency_sec": 18.2,
+      "had_sec_violation": false,
+      "error": null
+    },
+    {
+      "id": "scenario-010",
+      "input": "Создай S3 бакет для хранения резервных копий базы данных",
+      "success": true,
+      "status": "done",
+      "generate_attempts": 1,
+      "tokens": 5050,
+      "cost_usd": 0.02223,
+      "latency_sec": 9.9,
+      "had_sec_violation": false,
+      "error": null
+    }
+  ]
+}

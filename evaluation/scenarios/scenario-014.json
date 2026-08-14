@@ -1,0 +1,12 @@
+{
+  "id": "scenario-014",
+  "category": "networking",
+  "description": "Security group — правила для веб-сервера",
+  "input": "Create a security group for a web server that allows HTTP and HTTPS traffic in eu-north-1",
+  "acceptance": {
+    "min_resources": 1,
+    "required_types": [
+      "aws_security_group"
+    ]
+  }
+}

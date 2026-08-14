@@ -1,0 +1,13 @@
+{
+  "id": "scenario-015",
+  "category": "serverless",
+  "description": "Lambda без SQS — просто функция",
+  "input": "Create a Lambda function with an IAM role for processing image files",
+  "acceptance": {
+    "min_resources": 2,
+    "required_types": [
+      "aws_lambda_function",
+      "aws_iam_role"
+    ]
+  }
+}

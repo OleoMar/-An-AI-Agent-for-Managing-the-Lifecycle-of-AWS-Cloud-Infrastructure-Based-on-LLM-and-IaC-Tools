@@ -1,0 +1,15 @@
+{
+  "id": "scenario-006",
+  "category": "networking",
+  "description": "VPC с подсетями — сетевая инфраструктура",
+  "input": "Create a VPC with a public subnet and an internet gateway for a web app in eu-north-1",
+  "acceptance": {
+    "min_resources": 3,
+    "required_types": [
+      "aws_vpc",
+      "aws_subnet",
+      "aws_internet_gateway"
+    ],
+    "should_ask_clarification": false
+  }
+}

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS Infrastructure Agent</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f1117; color: #e1e4e8;
+      min-height: 100vh; display: flex;
+      flex-direction: column; align-items: center; padding: 40px 16px;
+    }
+    header { text-align: center; margin-bottom: 40px; }
+    header h1 { font-size: 28px; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
+    header p  { margin-top: 8px; color: #8b949e; font-size: 15px; }
+
+    .card {
+      width: 100%; max-width: 720px;
+      background: #161b22; border: 1px solid #30363d;
+      border-radius: 12px; padding: 24px; margin-bottom: 24px;
+    }
+
+    textarea {
+      width: 100%; background: #0d1117; border: 1px solid #30363d;
+      border-radius: 8px; color: #e1e4e8; font-size: 15px;
+      line-height: 1.6; padding: 14px 16px; resize: vertical;
+      min-height: 100px; outline: none; transition: border-color 0.15s;
+    }
+    textarea:focus { border-color: #58a6ff; }
+    textarea::placeholder { color: #484f58; }
+
+    .examples { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .example-btn {
+      background: #21262d; border: 1px solid #30363d; border-radius: 20px;
+      color: #8b949e; cursor: pointer; font-size: 12px; padding: 5px 12px;
+      transition: all 0.15s;
+    }
+    .example-btn:hover { background: #30363d; color: #e1e4e8; }
+
+    .actions { margin-top: 16px; display: flex; align-items: center; gap: 12px; }
+    button.primary {
+      background: #238636; border: none; border-radius: 8px; color: #fff;
+      cursor: pointer; font-size: 15px; font-weight: 600; padding: 10px 24px;
+      transition: background 0.15s;
+    }
+    button.primary:hover { background: #2ea043; }
+    button.primary:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
+    button.secondary {
+      background: #21262d; border: 1px solid #30363d; border-radius: 8px;
+      color: #e1e4e8; cursor: pointer; font-size: 14px; padding: 9px 20px;
+      transition: all 0.15s;
+    }
+    button.secondary:hover { background: #30363d; }
+
+    .spinner {
+      display: none; width: 18px; height: 18px;
+      border: 2px solid #30363d; border-top-color: #58a6ff;
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .status-text { color: #8b949e; font-size: 13px; }
+
+    /* ── Clarification form ── */
+    #clarify-section { display: none; width: 100%; max-width: 720px; }
+    .clarify-header {
+      font-size: 15px; color: #e1e4e8; font-weight: 500;
+      margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+    }
+    .clarify-icon { font-size: 20px; }
+    .question-group { margin-bottom: 18px; }
+    .question-label {
+      font-size: 13px; font-weight: 500; color: #e1e4e8;
+      margin-bottom: 8px; display: block;
+    }
+    select, input[type="text"] {
+      width: 100%; background: #0d1117; border: 1px solid #30363d;
+      border-radius: 8px; color: #e1e4e8; font-size: 14px;
+      padding: 10px 12px; outline: none; transition: border-color 0.15s;
+    }
+    select { cursor: pointer; appearance: none; -webkit-appearance: none;
+             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b949e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+             background-repeat: no-repeat; background-position: right 12px center;
+             padding-right: 32px; }
+    select:focus, input[type="text"]:focus { border-color: #58a6ff; }
+
+    .clarify-actions { margin-top: 20px; display: flex; gap: 12px; }
+
+    /* ── Result ── */
+    #result { display: none; width: 100%; max-width: 720px; }
+    .result-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .result-header h2 { font-size: 16px; font-weight: 600; }
+    .badges { display: flex; gap: 8px; flex-wrap: wrap; }
+    .badge {
+      background: #21262d; border: 1px solid #30363d; border-radius: 6px;
+      color: #8b949e; font-size: 12px; padding: 3px 10px;
+    }
+    .badge span { color: #e1e4e8; }
+    .stack-info {
+      background: #161b22; border: 1px solid #30363d;
+      border-radius: 8px; padding: 16px 20px; margin-bottom: 16px;
+    }
+    .stack-info .name  { font-size: 18px; font-weight: 700; color: #58a6ff; }
+    .stack-info .desc  { color: #8b949e; font-size: 14px; margin-top: 4px; }
+    .stack-info .region{ color: #3fb950; font-size: 13px; margin-top: 8px; }
+    .resources-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 12px;
+    }
+    .resource-card {
+      background: #161b22; border: 1px solid #30363d;
+      border-radius: 8px; padding: 14px 16px;
+    }
+    .resource-card .rname { font-weight: 600; font-size: 14px; color: #e1e4e8; }
+    .resource-card .rtype { font-family: monospace; font-size: 12px; color: #58a6ff; margin-top: 3px; }
+    .resource-card .rdesc { color: #8b949e; font-size: 13px; margin-top: 8px; line-height: 1.5; }
+    .resource-card .rdeps { margin-top: 8px; font-size: 12px; color: #f0883e; }
+    .resource-card .rconstraints { margin-top: 8px; font-size: 12px; color: #3fb950; font-family: monospace; }
+
+    .message-box { background: #161b22; border-radius: 8px; padding: 16px 20px; font-size: 14px; line-height: 1.6; }
+    .message-box.clarify { border: 1px solid #f0883e; color: #f0883e; }
+    .message-box.error   { border: 1px solid #f85149; color: #f85149; }
+    .message-box.error strong { display: block; margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>☁ AWS Infrastructure Agent</h1>
+  <p>Опиши что нужно развернуть — агент уточнит детали и создаст план</p>
+</header>
+
+<!-- Шаг 1: ввод запроса -->
+<div class="card" id="input-section">
+  <textarea id="userInput" placeholder="Например: Deploy a Node.js API with a PostgreSQL database"></textarea>
+
+  <div class="examples">
+    <span style="color:#484f58;font-size:12px;align-self:center;">Примеры:</span>
+    <button class="example-btn" onclick="setExample(this)">S3 bucket for user photos</button>
+    <button class="example-btn" onclick="setExample(this)">EC2 instance for web server</button>
+    <button class="example-btn" onclick="setExample(this)">Node.js API with PostgreSQL</button>
+    <button class="example-btn" onclick="setExample(this)">Lambda function with SQS queue</button>
+  </div>
+
+  <div class="actions">
+    <button class="primary" id="analyzeBtn" onclick="analyzeRequest()">Далее →</button>
+    <div class="spinner" id="spinner1"></div>
+    <span class="status-text" id="statusText1"></span>
+  </div>
+</div>
+
+<!-- Шаг 2: уточняющие вопросы -->
+<div id="clarify-section">
+  <div class="card">
+    <div class="clarify-header">
+      <span class="clarify-icon">🔍</span>
+      <span>Уточни детали — агент создаст более точный план</span>
+    </div>
+    <div id="questions-container"></div>
+    <div class="clarify-actions">
+      <button class="primary" id="generateBtn" onclick="generatePlan()">Сгенерировать план</button>
+      <button class="secondary" onclick="skipClarification()">Пропустить →</button>
+      <div class="spinner" id="spinner2"></div>
+      <span class="status-text" id="statusText2"></span>
+    </div>
+  </div>
+</div>
+
+<!-- Шаг 3: результат -->
+<div id="result"></div>
+
+<script>
+  let currentInput = '';
+  let currentQuestions = [];
+
+  function setExample(btn) {
+    document.getElementById('userInput').value = btn.textContent;
+  }
+
+  // ── Шаг 1: анализируем запрос и получаем вопросы ──────────────────────────
+  async function analyzeRequest() {
+    const input = document.getElementById('userInput').value.trim();
+    if (!input) return;
+    currentInput = input;
+
+    setLoading('analyzeBtn', 'spinner1', 'statusText1', true, 'Анализируем запрос...');
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('clarify-section').style.display = 'none';
+
+    try {
+      const resp = await fetch('/api/clarify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input }),
+      });
+      const data = await resp.json();
+
+      if (data.error) { showError(data.error); return; }
+
+      currentQuestions = data.questions || [];
+
+      if (currentQuestions.length === 0) {
+        // Вопросов нет — сразу генерируем
+        await generatePlanWithAnswers({});
+      } else {
+        // Показываем вопросы
+        renderQuestions(currentQuestions);
+        document.getElementById('clarify-section').style.display = 'block';
+        document.getElementById('clarify-section').scrollIntoView({ behavior: 'smooth' });
+      }
+    } catch (e) {
+      showError('Ошибка соединения: ' + e.message);
+    } finally {
+      setLoading('analyzeBtn', 'spinner1', 'statusText1', false);
+    }
+  }
+
+  // ── Рендерим вопросы ───────────────────────────────────────────────────────
+  function renderQuestions(questions) {
+    const container = document.getElementById('questions-container');
+    container.innerHTML = '';
+
+    questions.forEach(q => {
+      const group = document.createElement('div');
+      group.className = 'question-group';
+
+      const label = document.createElement('label');
+      label.className = 'question-label';
+      label.setAttribute('for', 'q_' + q.id);
+      label.textContent = q.question;
+      group.appendChild(label);
+
+      if (q.type === 'select' && q.options.length > 0) {
+        const sel = document.createElement('select');
+        sel.id = 'q_' + q.id;
+        q.options.forEach(opt => {
+          const o = document.createElement('option');
+          o.value = opt;
+          o.textContent = opt;
+          if (opt === q.default) o.selected = true;
+          sel.appendChild(o);
+        });
+        group.appendChild(sel);
+      } else {
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.id = 'q_' + q.id;
+        inp.placeholder = q.default || '';
+        inp.value = q.default || '';
+        group.appendChild(inp);
+      }
+
+      container.appendChild(group);
+    });
+  }
+
+  // ── Шаг 2: собираем ответы и генерируем ──────────────────────────────────
+  function collectAnswers() {
+    const answers = {};
+    currentQuestions.forEach(q => {
+      const el = document.getElementById('q_' + q.id);
+      if (el) answers[q.id] = el.value;
+    });
+    return answers;
+  }
+
+  async function generatePlan() {
+    const answers = collectAnswers();
+    await generatePlanWithAnswers(answers);
+  }
+
+  async function skipClarification() {
+    await generatePlanWithAnswers({});
+  }
+
+  async function generatePlanWithAnswers(answers) {
+    setLoading('generateBtn', 'spinner2', 'statusText2', true, 'Генерируем план...');
+    document.getElementById('result').style.display = 'none';
+
+    try {
+      const resp = await fetch('/api/plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: currentInput, answers }),
+      });
+      const data = await resp.json();
+      renderResult(data);
+      document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+    } catch (e) {
+      showError('Ошибка соединения: ' + e.message);
+    } finally {
+      setLoading('generateBtn', 'spinner2', 'statusText2', false);
+    }
+  }
+
+  // ── Рендерим результат ─────────────────────────────────────────────────────
+  function renderResult(data) {
+    const result = document.getElementById('result');
+    result.style.display = 'block';
+
+    if (data.status === 'clarify') {
+      result.innerHTML = `<div class="message-box clarify">⚠ ${escHtml(data.message)}</div>`;
+      return;
+    }
+    if (data.status === 'error') {
+      result.innerHTML = `<div class="message-box error"><strong>Ошибка</strong>${escHtml(data.message)}</div>`;
+      return;
+    }
+
+    const cost = data.estimated_cost != null ? `~$${data.estimated_cost}/мес` : '—';
+    const resourcesHtml = data.resources.map(r => {
+      const deps = r.depends_on.length ? `<div class="rdeps">↳ depends on: ${r.depends_on.join(', ')}</div>` : '';
+      const cKeys = Object.keys(r.constraints).filter(k => k !== 'tags');
+      const c = cKeys.length ? `<div class="rconstraints">${cKeys.map(k => `${k}: ${JSON.stringify(r.constraints[k])}`).join(' · ')}</div>` : '';
+      return `<div class="resource-card">
+        <div class="rname">${escHtml(r.name)}</div>
+        <div class="rtype">${escHtml(r.type)}</div>
+        <div class="rdesc">${escHtml(r.description)}</div>
+        ${deps}${c}
+      </div>`;
+    }).join('');
+
+    result.innerHTML = `
+      <div class="result-header">
+        <h2>📋 Сгенерированный план</h2>
+        <div class="badges">
+          <div class="badge">токены: <span>${data.tokens_used}</span></div>
+          <div class="badge">API: <span>$${data.cost_usd}</span></div>
+          <div class="badge">время: <span>${data.latency_sec}с</span></div>
+        </div>
+      </div>
+      <div class="stack-info">
+        <div class="name">${escHtml(data.stack_name)}</div>
+        <div class="desc">${escHtml(data.description)}</div>
+        <div class="region">📍 ${escHtml(data.aws_region)} · ${data.resources.length} ресурс(ов) · ${cost}</div>
+      </div>
+      <div class="resources-grid">${resourcesHtml}</div>`;
+  }
+
+  function showError(msg) {
+    const result = document.getElementById('result');
+    result.style.display = 'block';
+    result.innerHTML = `<div class="message-box error"><strong>Ошибка</strong>${escHtml(msg)}</div>`;
+  }
+
+  function setLoading(btnId, spinnerId, statusId, loading, text) {
+    const btn = document.getElementById(btnId);
+    const spinner = document.getElementById(spinnerId);
+    const status = document.getElementById(statusId);
+    if (btn) btn.disabled = loading;
+    if (spinner) spinner.style.display = loading ? 'block' : 'none';
+    if (status) status.textContent = loading ? (text || '') : '';
+  }
+
+  function escHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  document.getElementById('userInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) analyzeRequest();
+  });
+</script>
+</body>
+</html>

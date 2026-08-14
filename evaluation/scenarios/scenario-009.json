@@ -1,0 +1,14 @@
+{
+  "id": "scenario-009",
+  "category": "multi-resource",
+  "description": "SNS topic + SQS подписка — event-driven паттерн",
+  "input": "Create an SNS topic for order notifications and an SQS queue subscribed to it",
+  "acceptance": {
+    "min_resources": 2,
+    "required_types": [
+      "aws_sns_topic",
+      "aws_sqs_queue"
+    ],
+    "should_ask_clarification": false
+  }
+}

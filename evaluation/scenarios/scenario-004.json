@@ -1,0 +1,9 @@
+{
+  "id": "scenario-004",
+  "category": "clarification",
+  "description": "Расплывчатый запрос — агент должен попросить уточнения",
+  "input": "Set up something for my app",
+  "acceptance": {
+    "should_ask_clarification": true
+  }
+}

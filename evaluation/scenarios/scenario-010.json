@@ -1,0 +1,13 @@
+{
+  "id": "scenario-010",
+  "category": "edge",
+  "description": "Запрос на русском — агент должен справиться",
+  "input": "Создай S3 бакет для хранения резервных копий базы данных",
+  "acceptance": {
+    "min_resources": 1,
+    "required_types": [
+      "aws_s3_bucket"
+    ],
+    "should_ask_clarification": false
+  }
+}

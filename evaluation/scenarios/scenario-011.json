@@ -1,0 +1,12 @@
+{
+  "id": "scenario-011",
+  "category": "simple",
+  "description": "SNS topic — простой pub/sub",
+  "input": "Create an SNS topic for sending email notifications to users",
+  "acceptance": {
+    "min_resources": 1,
+    "required_types": [
+      "aws_sns_topic"
+    ]
+  }
+}

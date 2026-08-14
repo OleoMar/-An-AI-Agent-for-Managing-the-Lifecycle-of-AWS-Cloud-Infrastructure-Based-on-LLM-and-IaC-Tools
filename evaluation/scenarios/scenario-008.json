@@ -1,0 +1,13 @@
+{
+  "id": "scenario-008",
+  "category": "security",
+  "description": "S3 bucket — должен иметь шифрование и versioning",
+  "input": "Create a private S3 bucket for storing audit logs",
+  "acceptance": {
+    "min_resources": 1,
+    "required_types": [
+      "aws_s3_bucket"
+    ],
+    "should_ask_clarification": false
+  }
+}

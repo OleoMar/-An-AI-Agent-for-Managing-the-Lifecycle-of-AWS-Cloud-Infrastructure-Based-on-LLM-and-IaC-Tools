@@ -1,0 +1,12 @@
+{
+  "id": "scenario-017",
+  "category": "security",
+  "description": "IAM role для сервиса",
+  "input": "Create an IAM role that allows EC2 to read from S3",
+  "acceptance": {
+    "min_resources": 1,
+    "required_types": [
+      "aws_iam_role"
+    ]
+  }
+}

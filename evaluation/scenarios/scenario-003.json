@@ -1,0 +1,13 @@
+{
+  "id": "scenario-003",
+  "category": "simple",
+  "description": "SQS очередь для фоновых задач",
+  "input": "Create an SQS queue for background job processing",
+  "acceptance": {
+    "min_resources": 1,
+    "required_types": [
+      "aws_sqs_queue"
+    ],
+    "should_ask_clarification": false
+  }
+}

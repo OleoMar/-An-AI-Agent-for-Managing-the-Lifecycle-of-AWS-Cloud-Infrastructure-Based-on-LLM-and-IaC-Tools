@@ -1,0 +1,13 @@
+{
+  "id": "scenario-002",
+  "category": "simple",
+  "description": "DynamoDB таблица — serverless хранилище",
+  "input": "Create a DynamoDB table for storing user sessions",
+  "acceptance": {
+    "min_resources": 1,
+    "required_types": [
+      "aws_dynamodb_table"
+    ],
+    "should_ask_clarification": false
+  }
+}

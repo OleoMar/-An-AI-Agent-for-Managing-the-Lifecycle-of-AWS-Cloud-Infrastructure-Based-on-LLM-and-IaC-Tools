@@ -1,0 +1,9 @@
+{
+  "id": "scenario-005",
+  "category": "clarification",
+  "description": "EC2 без деталей — агент должен спросить тип инстанса и назначение",
+  "input": "I need an EC2 instance",
+  "acceptance": {
+    "should_ask_clarification": true
+  }
+}
