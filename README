@@ -1,0 +1,55 @@
+# Agent for Managing the Lifecycle of AWS Cloud Infrastructure
+
+Bachelor Thesis — University of Europe for Applied Sciences, Potsdam  
+Author: Milena Fomenko | Matriculation num: 58735480  
+Supervisors: Prof. Dr. Rand Kouatly, Aaron Crandall 
+
+## Overview
+LLM-based agent that provisions and manages AWS 
+infrastructure from natural language requests. The agent generates 
+Terraform configurations, validates them with tflint and Checkov, 
+deploys to AWS, and tracks all created stacks in a local registry.
+
+## Architecture
+Four-stage pipeline:
+1. Intent Parsing (Pydantic, claude-sonnet-4-6)
+2. IaC Generation + Validation (tflint, Checkov, retry ×3)
+3. Deployment + Reconciliation (terraform apply, policy gate)
+4. Lifecycle Management (SQLite registry)
+
+Two orchestration strategies: LangGraph and ReAct.
+
+## Requirements
+- Python 3.11
+- Terraform 1.9+
+- AWS account with credentials configured
+- Anthropic API key
+
+## Installation
+pip install -r requirements.txt
+
+## Usage
+# Web interface
+python app.py
+
+# CLI
+python main.py --intent "Create an S3 bucket for user photos"
+python main.py --list
+python main.py --destroy my-stack
+
+# Benchmark
+python -m evaluation.benchmark_runner --dry-run --run-name run_langgraph
+python -m evaluation.benchmark_runner --dry-run --react --run-name run_react
+
+## Environment Variables
+Copy .env.example to .env and fill in:
+- ANTHROPIC_API_KEY=your_key
+- AWS_ACCESS_KEY_ID=your_key
+- AWS_SECRET_ACCESS_KEY=your_key
+- AWS_DEFAULT_REGION=eu-north-1
+
+## Results
+| Strategy  | TCR  | Avg Latency | Avg Cost |
+|-----------|------|-------------|----------|
+| LangGraph | 90%  | 12.5 s      | $0.026   |
+| ReAct     | 90%  | 22.8 s      | $0.025   |
