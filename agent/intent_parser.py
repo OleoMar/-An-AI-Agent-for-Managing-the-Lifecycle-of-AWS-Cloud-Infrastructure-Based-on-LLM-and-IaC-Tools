@@ -20,6 +20,7 @@ from pydantic import ValidationError
 
 from agent.llm_client import call_llm, load_prompt, LLMResponse
 from schemas.plan_schema import Plan
+from security.sanitizer import sanitize
 from config import MAX_PARSE_RETRIES
 
 logger = logging.getLogger(__name__)
@@ -47,14 +48,25 @@ class ClarificationNeeded(Exception):
 def parse_intent(
     user_input: str,
     stack_context: Optional[str] = None,
+    sanitizer_enabled: bool = True,
 ) -> tuple[Plan, list[LLMResponse]]:
     """
     Разбирает запрос пользователя и возвращает валидный Plan.
 
     Параметры:
-        user_input     — текст от пользователя
-        stack_context  — если стэк уже существует, передаём его JSON сюда
-                         чтобы LLM знала контекст при изменении
+        user_input         — текст от пользователя
+        stack_context       — если стэк уже существует, передаём его JSON сюда
+                              чтобы LLM знала контекст при изменении.
+                              Это единственный источник данных, пришедших
+                              не напрямую от пользователя в этой текущей
+                              сессии (а из ранее сохранённого стэка), и
+                              потому единственная точка, где untrusted
+                              data (например, вредоносный intent или тег
+                              из прошлого запроса) может попасть в промпт.
+        sanitizer_enabled   — включить/выключить обёртку stack_context в
+                              <untrusted_data> теги. Используется для
+                              security ablation study (RQ3); в normal
+                              production-режиме всегда True.
 
     Возвращает:
         (plan, llm_calls) — объект Plan и список всех вызовов LLM
@@ -67,12 +79,20 @@ def parse_intent(
     llm_calls: list[LLMResponse] = []
     last_error: str = ""
 
-    # Если есть контекст существующего стэка — добавляем в запрос
+    # Если есть контекст существующего стэка — добавляем в запрос.
+    # stack_context пришёл из ранее сохранённого стэка (agent/lifecycle_manager.py),
+    # то есть это untrusted data относительно текущей сессии — оборачиваем
+    # его в security/sanitizer.py перед тем, как подставить в промпт.
     full_request = user_input
     if stack_context:
+        safe_context = (
+            sanitize(stack_context, source="existing_stack_context")
+            if sanitizer_enabled
+            else stack_context
+        )
         full_request = (
             f"{user_input}\n\n"
-            f"[EXISTING STACK CONTEXT]\n{stack_context}"
+            f"[EXISTING STACK CONTEXT]\n{safe_context}"
         )
 
     for attempt in range(1, MAX_PARSE_RETRIES + 1):
