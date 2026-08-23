@@ -45,6 +45,11 @@ class ScenarioResult:
     error_message:     Optional[str] = None
     stack_name:        Optional[str] = None
     resources_created: list[str] = field(default_factory=list)
+    # ── Security ablation study (RQ3) ────────────────────────────────────────
+    security_config:      str = "full"           # какая конфигурация ablation использовалась
+    gate_approved:        Optional[bool] = None   # решение Policy Gate (None = слой выключен)
+    gate_blocked_ops:      list[str] = field(default_factory=list)  # HIGH-риск операции, если были
+    iam_permission_count: Optional[int] = None    # сколько IAM actions вычислил IAM Scope (None = выключен)
 
 
 # ── Агрегированные метрики ─────────────────────────────────────────────────────
