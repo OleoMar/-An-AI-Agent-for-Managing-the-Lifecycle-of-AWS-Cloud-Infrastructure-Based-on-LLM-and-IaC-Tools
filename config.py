@@ -60,3 +60,15 @@ HIGH_RISK_ACTIONS = {
 # ── Evaluation ────────────────────────────────────────────────────────────────
 EVAL_SCENARIOS_DIR = BASE_DIR / "evaluation" / "scenarios"
 EVAL_RESULTS_DIR = BASE_DIR / "evaluation" / "results"
+
+# ── Security Ablation Study (RQ3) ────────────────────────────────────────────
+# Каждая конфигурация включает/выключает отдельные слои безопасности
+# независимо друг от друга. Используется в evaluation/benchmark_runner.py
+# через флаг --security-config для количественного ablation study.
+SECURITY_ABLATION_CONFIGS = {
+    "none":         {"sanitizer": False, "iam": False, "policy_gate": False},
+    "sanitizer":    {"sanitizer": True,  "iam": False, "policy_gate": False},
+    "iam":          {"sanitizer": False, "iam": True,  "policy_gate": False},
+    "policy_gate":  {"sanitizer": False, "iam": False, "policy_gate": True},
+    "full":         {"sanitizer": True,  "iam": True,  "policy_gate": True},
+}
