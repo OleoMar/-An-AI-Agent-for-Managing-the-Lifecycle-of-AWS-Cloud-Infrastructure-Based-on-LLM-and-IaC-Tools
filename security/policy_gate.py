@@ -21,14 +21,32 @@ security/policy_gate.py
 
 import json
 import logging
+import os
 import subprocess
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 
-from config import TERRAFORM_CMD, HIGH_RISK_RESOURCE_TYPES, HIGH_RISK_ACTIONS
+from config import TERRAFORM_CMD, HIGH_RISK_RESOURCE_TYPES, HIGH_RISK_ACTIONS, BASE_DIR
 
 logger = logging.getLogger(__name__)
+
+# ── Кэш провайдеров Terraform ────────────────────────────────────────────────
+# Без этого каждый вызов _get_terraform_plan() заново скачивает AWS provider
+# (~100+ МБ) через terraform init. При 20 сценариях подряд это приводит к
+# большим задержкам (наблюдалось 43–146с на сценарий вместо обычных 10–20с)
+# и к сетевым таймаутам/обрывам соединения при security ablation study.
+# Один общий кэш на диске решает обе проблемы: первый init скачивает
+# провайдер, все последующие используют локальную копию.
+_TF_PLUGIN_CACHE_DIR = BASE_DIR / ".terraform_plugin_cache"
+_TF_PLUGIN_CACHE_DIR.mkdir(exist_ok=True)
+
+
+def _tf_env() -> dict:
+    """Окружение для subprocess-вызовов terraform с включённым plugin cache."""
+    env = os.environ.copy()
+    env["TF_PLUGIN_CACHE_DIR"] = str(_TF_PLUGIN_CACHE_DIR)
+    return env
 
 
 # ── Уровни риска ──────────────────────────────────────────────────────────────
@@ -133,12 +151,13 @@ def _get_terraform_plan(workspace: Path) -> dict | None:
     Возвращает None если terraform не установлен или произошла ошибка.
     """
     try:
-        # Сначала init (без вывода)
+        # Сначала init (без вывода) — с общим plugin cache
         subprocess.run(
             [TERRAFORM_CMD, "init", "-input=false"],
             cwd=workspace,
             capture_output=True,
             timeout=120,
+            env=_tf_env(),
         )
 
         # Создаём plan файл
@@ -148,6 +167,7 @@ def _get_terraform_plan(workspace: Path) -> dict | None:
             capture_output=True,
             text=True,
             timeout=180,
+            env=_tf_env(),
         )
 
         if result.returncode not in (0, 2):
@@ -161,6 +181,7 @@ def _get_terraform_plan(workspace: Path) -> dict | None:
             capture_output=True,
             text=True,
             timeout=60,
+            env=_tf_env(),
         )
 
         if show_result.returncode != 0:
